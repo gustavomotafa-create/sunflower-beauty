@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animes - Sunflower Anime 🌻</title>
+  <meta name="description" content="Posts sobre animes.">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .paginacao {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .paginacao button,
+    .paginacao span {
+      min-width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .paginacao button {
+      border: none;
+      background: #2a2a2a;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s ease;
+      padding: 0 14px;
+    }
+
+    .paginacao button:hover {
+      background: #3a3a3a;
+    }
+
+    .paginacao button.ativo {
+      background: #f5a623;
+      color: #111;
+    }
+
+    .paginacao button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .paginacao .reticencias {
+      color: #aaa;
+      min-width: auto;
+      padding: 0 4px;
+    }
+
+    @media (max-width: 768px) {
+      .paginacao {
+        gap: 8px;
+      }
+
+      .paginacao button,
+      .paginacao span {
+        min-width: 40px;
+        height: 40px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="logo">
+    <img src="imagens/logo.png" alt="Logo">
+    <div>
+      <h1><span class="laranja">Sunflower</span> Anime 🌻</h1>
+      <p>Teorias, curiosidades e notícias do mundo dos animes</p>
+    </div>
+  </div>
+</header>
+
+<nav class="menu">
+  <a href="index.html" class="menu-link">Todos</a>
+  <a href="teorias.html" class="menu-link">Teorias</a>
+  <a href="animes.html" class="menu-link ativo">Animes</a>
+  <a href="curiosidades.html" class="menu-link">Curiosidades</a>
+</nav>
+
+<main class="container">
+  <section class="principal">
+    <h2>Animes</h2>
+
+    <div class="grid-posts" id="animes-container"></div>
+    <div class="paginacao" id="paginacao-animes"></div>
+
+  </section>
+</main>
+
+<footer class="rodape">
+  <p>© 2026 Sunflower Anime 🌻</p>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB-XtsU24UNSKJra1Lq_HVvBFdHBG7kezw",
+    authDomain: "sunflower-anime-site.firebaseapp.com",
+    projectId: "sunflower-anime-site",
+    storageBucket: "sunflower-anime-site.firebasestorage.app",
+    messagingSenderId: "727681948763",
+    appId: "1:727681948763:web:423e2b2066274ee6a3737e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const POSTS_POR_PAGINA = 6;
+  let paginaAtual = 1;
+  let todosAnimes = [];
+
+  function criarBotaoPagina(numero) {
+    const botao = document.createElement("button");
+    botao.textContent = numero;
+
+    if (numero === paginaAtual) {
+      botao.classList.add("ativo");
+    }
+
+    botao.onclick = () => {
+      paginaAtual = numero;
+      renderizarAnimesPaginados();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    return botao;
+  }
+
+  function criarReticencias() {
+    const span = document.createElement("span");
+    span.textContent = "...";
+    span.className = "reticencias";
+    return span;
+  }
+
+  function montarPaginacao(totalPaginas) {
+    const paginacao = document.getElementById("paginacao-animes");
+    paginacao.innerHTML = "";
+
+    if (totalPaginas <= 1) return;
+
+    const botaoAnterior = document.createElement("button");
+    botaoAnterior.textContent = "‹";
+    botaoAnterior.disabled = paginaAtual === 1;
+    botaoAnterior.onclick = () => {
+      paginaAtual--;
+      renderizarAnimesPaginados();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    paginacao.appendChild(botaoAnterior);
+
+    if (totalPaginas <= 7) {
+      for (let i = 1; i <= totalPaginas; i++) {
+        paginacao.appendChild(criarBotaoPagina(i));
+      }
+    } else {
+      paginacao.appendChild(criarBotaoPagina(1));
+
+      if (paginaAtual > 3) {
+        paginacao.appendChild(criarReticencias());
+      }
+
+      let inicio = Math.max(2, paginaAtual - 1);
+      let fim = Math.min(totalPaginas - 1, paginaAtual + 1);
+
+      if (paginaAtual <= 3) {
+        inicio = 2;
+        fim = 4;
+      }
+
+      if (paginaAtual >= totalPaginas - 2) {
+        inicio = totalPaginas - 3;
+        fim = totalPaginas - 1;
+      }
+
+      for (let i = inicio; i <= fim; i++) {
+        paginacao.appendChild(criarBotaoPagina(i));
+      }
+
+      if (paginaAtual < totalPaginas - 2) {
+        paginacao.appendChild(criarReticencias());
+      }
+
+      paginacao.appendChild(criarBotaoPagina(totalPaginas));
+    }
+
+    const botaoProximo = document.createElement("button");
+    botaoProximo.textContent = "›";
+    botaoProximo.disabled = paginaAtual === totalPaginas;
+    botaoProximo.onclick = () => {
+      paginaAtual++;
+      renderizarAnimesPaginados();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    paginacao.appendChild(botaoProximo);
+  }
+
+  function renderizarAnimesPaginados() {
+    const container = document.getElementById("animes-container");
+    const paginacao = document.getElementById("paginacao-animes");
+
+    container.innerHTML = "";
+    paginacao.innerHTML = "";
+
+    if (todosAnimes.length === 0) {
+      container.innerHTML = `
+        <article class="card card-hover">
+          <div class="conteudo-card">
+            <span class="tag">Aviso</span>
+            <h3>Nenhum anime criado ainda</h3>
+            <p>Crie posts no admin para eles aparecerem aqui 🔥</p>
+          </div>
+        </article>
+      `;
+      return;
+    }
+
+    const totalPaginas = Math.ceil(todosAnimes.length / POSTS_POR_PAGINA);
+    const inicio = (paginaAtual - 1) * POSTS_POR_PAGINA;
+    const fim = inicio + POSTS_POR_PAGINA;
+    const animesDaPagina = todosAnimes.slice(inicio, fim);
+
+    animesDaPagina.forEach(post => {
+      const slug = post.slug ? post.slug : "#";
+      const descricao = post.descricao ? post.descricao : "Post criado pelo admin 🔥";
+
+      container.innerHTML += `
+        <a href="post.html?slug=${encodeURIComponent(slug)}" class="card-link">
+          <article class="card">
+            <img src="${post.imagem}" alt="${post.titulo}">
+            <div class="conteudo-card">
+              <span class="tag">Anime</span>
+              <h3>${post.titulo}</h3>
+              <p>${descricao}</p>
+            </div>
+          </article>
+        </a>
+      `;
+    });
+
+    montarPaginacao(totalPaginas);
+  }
+
+  async function carregarAnimes() {
+    const container = document.getElementById("animes-container");
+
+    try {
+      const snapshot = await getDocs(collection(db, "posts"));
+      let posts = [];
+
+      snapshot.forEach((doc) => {
+        posts.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+
+      todosAnimes = posts.filter(post => post.categoria === "animes");
+      paginaAtual = 1;
+      renderizarAnimesPaginados();
+
+    } catch (error) {
+      console.error("Erro ao carregar animes do Firebase:", error);
+
+      container.innerHTML = `
+        <article class="card card-hover">
+          <div class="conteudo-card">
+            <span class="tag">Erro</span>
+            <h3>Erro ao carregar animes</h3>
+            <p>Confira a conexão com o Firebase 🔥</p>
+          </div>
+        </article>
+      `;
+    }
+  }
+
+  carregarAnimes();
+</script>
+
+</body>
+</html>

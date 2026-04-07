@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunflower Beauty 🌻</title>
+  <meta name="description" content="Reviews sinceras, truques de maquiagem, fofocas beauty e achadinhos baratos.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="site-bg"></div>
+
+  <header class="topo">
+    <div class="topo-conteudo">
+      <a href="index.html" class="logo-wrap">
+        <img src="imagens/logo.png" alt="Logo Sunflower Beauty">
+        <div class="logo-texto">
+          <h1><span class="laranja">Sunflower</span> Beauty 🌻</h1>
+          <p>Beleza real, feminina e acessível</p>
+        </div>
+      </a>
+
+      <div class="topo-direita">
+        <span class="topo-badge">Reviews reais ✨</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="login-barra">
+    <div class="login-box">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="senha" placeholder="Senha">
+      <button onclick="login()">Entrar</button>
+      <button onclick="logout()">Sair</button>
+    </div>
+
+    <div id="admin-area" class="admin-area" style="display:none;">
+      <h2>Área Admin 🔒</h2>
+    </div>
+  </section>
+
+  <nav class="menu">
+    <a href="index.html" class="menu-link ativo">Todos</a>
+    <a href="reviews.html" class="menu-link">Reviews sinceras</a>
+    <a href="truques.html" class="menu-link">Truques de maquiagem</a>
+    <a href="fofocas.html" class="menu-link">Fofocas beauty</a>
+    <a href="achadinhos.html" class="menu-link">Achadinhos baratos</a>
+  </nav>
+
+  <main class="container">
+    <section class="principal">
+
+      <section class="hero-beauty">
+        <div class="hero-principal">
+          <span class="hero-kicker">🌻 Sunflower Beauty</span>
+
+          <h2>
+            O cantinho beauty mais bonito da sua rotina
+          </h2>
+
+          <p>
+            Reviews sinceras, truques fáceis, comparações úteis e achadinhos baratos
+            pra quem ama ficar linda sem gastar uma fortuna.
+          </p>
+
+          <div class="hero-botoes">
+            <a href="#posts-dinamicos" class="hero-botao hero-botao-principal">Explorar posts</a>
+            <a href="achadinhos.html" class="hero-botao hero-botao-secundario">Ver achadinhos</a>
+          </div>
+
+          <div class="hero-info-grid">
+            <div class="hero-info-card">
+              <strong>Fácil de entender</strong>
+              <span>Linguagem simples e direta</span>
+            </div>
+
+            <div class="hero-info-card">
+              <strong>Reviews sinceras</strong>
+              <span>Sem enrolação e sem puxar saco</span>
+            </div>
+
+            <div class="hero-info-card">
+              <strong>BBB da beleza</strong>
+              <span>Bonito, bom e barato</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-lateral">
+          <div class="hero-lateral-topo">
+            <span class="mini-kicker">Favorito das girls 💛</span>
+            <h3>Um visual premium, feminino e marcante</h3>
+            <p>
+              O foco aqui é juntar conteúdo útil com visual bonito, deixando o site
+              com cara de marca forte e conteúdo que dá vontade de clicar.
+            </p>
+          </div>
+
+          <div class="hero-mini-lista">
+            <div class="hero-mini-item">
+              <strong>💄 Reviews sinceras</strong>
+              <span>Base, corretivo, pó, blush, batom e mais.</span>
+            </div>
+
+            <div class="hero-mini-item">
+              <strong>✨ Truques úteis</strong>
+              <span>Dicas fáceis pra make durar mais e ficar linda.</span>
+            </div>
+
+            <div class="hero-mini-item">
+              <strong>🛍️ Achadinhos baratos</strong>
+              <span>Produtos bonitos e acessíveis que valem a pena.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="categorias-home">
+        <div class="secao-topo">
+          <h2>Categorias em destaque</h2>
+          <span class="secao-chip">Escolha sua vibe</span>
+        </div>
+
+        <div class="categorias-grid">
+          <a href="reviews.html" class="categoria-box">
+            <div class="categoria-icone">💄</div>
+            <h3>Reviews sinceras</h3>
+            <p>Opiniões reais sobre produtos que realmente valem ou não valem a compra.</p>
+          </a>
+
+          <a href="truques.html" class="categoria-box">
+            <div class="categoria-icone">✨</div>
+            <h3>Truques de maquiagem</h3>
+            <p>Dicas rápidas, práticas e bonitas pra facilitar teu dia a dia.</p>
+          </a>
+
+          <a href="fofocas.html" class="categoria-box">
+            <div class="categoria-icone">🪞</div>
+            <h3>Fofocas beauty</h3>
+            <p>Novidades, produtos virais e assuntos que estão bombando no mundo da beleza.</p>
+          </a>
+
+          <a href="achadinhos.html" class="categoria-box">
+            <div class="categoria-icone">🛍️</div>
+            <h3>Achadinhos baratos</h3>
+            <p>Aqueles produtinhos lindos, úteis e acessíveis que todo mundo ama encontrar.</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="secao-bloco">
+        <div class="secao-topo">
+          <h2>Destaque do momento</h2>
+          <span class="secao-chip">Post principal</span>
+        </div>
+        <div id="destaque-container"></div>
+      </section>
+
+      <section class="secao-bloco">
+        <div class="secao-topo">
+          <h2>Últimos posts</h2>
+          <span class="secao-chip">Atualizado do Firebase</span>
+        </div>
+
+        <div class="grid-posts" id="posts-dinamicos"></div>
+        <div class="paginacao" id="paginacao-posts"></div>
+      </section>
+
+      <section class="bloco-final">
+        <div class="bloco-final-conteudo">
+          <span class="mini-kicker">Sobre a marca 🌻</span>
+          <h2>Sunflower Beauty</h2>
+          <p>
+            Um site feito para mulheres que querem beleza bonita, conteúdo leve,
+            opinião sincera e produtos mais acessíveis — tudo com visual feminino,
+            acolhedor e elegante.
+          </p>
+        </div>
+      </section>
+
+    </section>
+
+    <aside class="lateral">
+      <div class="lateral-box">
+        <div class="secao-topo lateral-topo">
+          <h2>Mais amados</h2>
+          <span class="secao-chip">Top posts</span>
+        </div>
+        <div id="mais-vistos-container"></div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="rodape">
+    <div class="rodape-conteudo">
+      <p>© 2026 Sunflower Beauty 🌻</p>
+      <p class="rodape-sub">Beleza real, feminina e acessível.</p>
+
+      <div class="rodape-links">
+        <a href="sobre.html">Sobre</a>
+        <span>•</span>
+        <a href="privacidade.html">Privacidade</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="home.js"></script>
+</body>
+</html>
