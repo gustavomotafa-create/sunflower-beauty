@@ -6,6 +6,9 @@
   <title>Post - Sunflower Beauty</title>
   <link rel="stylesheet" href="style.css">
 
+  <!-- 🔥 Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <style>
     .post-page {
       max-width: 1180px;
@@ -89,8 +92,68 @@
     .texto-post {
       color: #6f5a49;
       line-height: 1.9;
-      white-space: pre-line;
       font-size: 1.02rem;
+    }
+
+    .texto-post h1,
+    .texto-post h2,
+    .texto-post h3,
+    .texto-post h4,
+    .texto-post h5,
+    .texto-post h6 {
+      color: var(--title);
+      line-height: 1.2;
+      margin: 26px 0 14px;
+      font-weight: 800;
+    }
+
+    .texto-post h1 { font-size: 2rem; }
+    .texto-post h2 { font-size: 1.7rem; }
+    .texto-post h3 { font-size: 1.4rem; }
+    .texto-post h4 { font-size: 1.2rem; }
+
+    .texto-post p {
+      margin: 0 0 18px;
+    }
+
+    .texto-post strong {
+      color: #4f3a2b;
+      font-weight: 800;
+    }
+
+    .texto-post ul,
+    .texto-post ol {
+      margin: 0 0 20px 22px;
+      padding: 0;
+    }
+
+    .texto-post li {
+      margin-bottom: 8px;
+    }
+
+    .texto-post blockquote {
+      margin: 20px 0;
+      padding: 14px 18px;
+      background: #fff8ef;
+      border-left: 4px solid #f5c542;
+      border-radius: 12px;
+      color: #7a6554;
+    }
+
+    .texto-post hr {
+      border: none;
+      border-top: 1px solid #efdca8;
+      margin: 28px 0;
+    }
+
+    .texto-post a {
+      color: #c9880f;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .texto-post a:hover {
+      text-decoration: underline;
     }
 
     .nota-post {
@@ -225,6 +288,10 @@
       .post-completo img {
         max-height: 260px;
       }
+
+      .texto-post h1 { font-size: 1.7rem; }
+      .texto-post h2 { font-size: 1.45rem; }
+      .texto-post h3 { font-size: 1.25rem; }
     }
   </style>
 </head>
@@ -319,6 +386,14 @@
         .replaceAll("'", "&#039;");
     }
 
+    function renderMarkdown(texto = "") {
+      try {
+        return marked.parse(String(texto));
+      } catch {
+        return esc(texto);
+      }
+    }
+
     async function carregarPost() {
       if (!id) {
         container.innerHTML = `
@@ -358,7 +433,7 @@
         const categoria = esc(post.categoria || "Post");
         const titulo = esc(post.titulo || "Sem título");
         const data = esc(post.data || "Sem data");
-        const descricao = esc(post.descricao || "Sem descrição.");
+        const descricao = renderMarkdown(post.descricao || "Sem descrição.");
         const imagem = post.imagem ? `<img src="${post.imagem}" alt="${titulo}">` : "";
 
         container.innerHTML = `
