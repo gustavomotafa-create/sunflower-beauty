@@ -19,6 +19,15 @@ const POSTS_POR_PAGINA = 6;
 let paginaAtual = 1;
 let todosUltimosPosts = [];
 
+// 🔥 NOVO: renderiza markdown
+function renderMarkdown(texto = "") {
+  try {
+    return marked.parse(String(texto));
+  } catch {
+    return String(texto);
+  }
+}
+
 function escaparHTML(texto = "") {
   return String(texto)
     .replaceAll("&", "&amp;")
@@ -190,7 +199,7 @@ function renderizarDestaque(post) {
   const linkPost = obterLinkPost(post);
   const categoria = escaparHTML(post.categoria);
   const titulo = escaparHTML(post.titulo);
-  const descricao = escaparHTML(cortarTexto(post.descricao, 190));
+  const descricao = renderMarkdown(cortarTexto(post.descricao, 190));
   const imagem = obterImagemSegura(post.imagem);
 
   destaqueContainer.innerHTML = `
@@ -200,7 +209,7 @@ function renderizarDestaque(post) {
         <div class="conteudo-card">
           <span class="tag">${categoria}</span>
           <h3>${titulo}</h3>
-          <p>${descricao}</p>
+          <div class="texto-markdown-preview">${descricao}</div>
         </div>
       </article>
     </a>
@@ -239,7 +248,7 @@ function renderizarPostsPaginados() {
     const linkPost = obterLinkPost(post);
     const categoria = escaparHTML(post.categoria);
     const titulo = escaparHTML(post.titulo);
-    const descricao = escaparHTML(cortarTexto(post.descricao, 110));
+    const descricao = renderMarkdown(cortarTexto(post.descricao, 110));
     const imagem = obterImagemSegura(post.imagem);
 
     postsDinamicos.innerHTML += `
@@ -249,7 +258,7 @@ function renderizarPostsPaginados() {
           <div class="conteudo-card">
             <span class="tag">${categoria}</span>
             <h3>${titulo}</h3>
-            <p>${descricao}</p>
+            <div class="texto-markdown-preview">${descricao}</div>
           </div>
         </article>
       </a>
@@ -282,7 +291,7 @@ function renderizarMaisVistos(posts) {
     const linkPost = obterLinkPost(post);
     const categoria = escaparHTML(post.categoria);
     const titulo = escaparHTML(post.titulo);
-    const descricao = escaparHTML(cortarTexto(post.descricao, 70));
+    const descricao = renderMarkdown(cortarTexto(post.descricao, 70));
     const imagem = obterImagemSegura(post.imagem);
     const views = post.views || 0;
 
@@ -293,7 +302,7 @@ function renderizarMaisVistos(posts) {
           <div class="mini-post-info">
             <span class="tag">${categoria}</span>
             <h4>${titulo}</h4>
-            <p>${descricao}</p>
+            <div class="texto-markdown-preview">${descricao}</div>
             <p class="mini-post-views">💖 ${views} visualizações</p>
           </div>
         </div>
