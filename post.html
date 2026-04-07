@@ -112,19 +112,13 @@
     .texto-post h3 { font-size: 1.4rem; }
     .texto-post h4 { font-size: 1.2rem; }
 
-    /* 🔥 CORREÇÃO DO BUG */
     .texto-post p {
-      margin: 0 0 10px;
-    }
-
-    .texto-post p + ul,
-    .texto-post p + ol {
-      margin-top: 6px;
+      margin: 0 0 6px;
     }
 
     .texto-post ul,
     .texto-post ol {
-      margin: 0 0 16px 22px;
+      margin: 6px 0 16px 22px;
       padding: 0;
     }
 
@@ -258,14 +252,6 @@
       font-size: 14px;
     }
 
-    .post-notfound {
-      background: rgba(255, 253, 249, 0.94);
-      border: 1px solid rgba(240, 225, 186, 0.95);
-      border-radius: 26px;
-      padding: 26px;
-      box-shadow: 0 16px 34px rgba(176, 132, 76, 0.10);
-    }
-
     @media (max-width: 980px) {
       .post-shell {
         grid-template-columns: 1fr;
@@ -274,30 +260,6 @@
       .post-lateral {
         position: static;
       }
-    }
-
-    @media (max-width: 768px) {
-      .post-page {
-        padding: 20px 16px 36px;
-      }
-
-      .post-completo,
-      .post-notfound {
-        padding: 20px;
-        border-radius: 22px;
-      }
-
-      .post-header h1 {
-        font-size: 2.1rem;
-      }
-
-      .post-completo img {
-        max-height: 260px;
-      }
-
-      .texto-post h1 { font-size: 1.7rem; }
-      .texto-post h2 { font-size: 1.45rem; }
-      .texto-post h3 { font-size: 1.25rem; }
     }
   </style>
 </head>
@@ -314,172 +276,56 @@
           <p>Beleza real, feminina e acessível</p>
         </div>
       </a>
-
-      <div class="topo-direita">
-        <span class="topo-badge">Post completo ✨</span>
-      </div>
     </div>
   </header>
 
-  <nav class="menu">
-    <a href="index.html" class="menu-link">Todos</a>
-    <a href="reviews.html" class="menu-link">Reviews sinceras</a>
-    <a href="truques.html" class="menu-link">Truques de maquiagem</a>
-    <a href="fofocas.html" class="menu-link">Fofocas beauty</a>
-    <a href="achadinhos.html" class="menu-link">Achadinhos baratos</a>
-  </nav>
-
   <main class="post-page">
-    <div class="post-topbar">
-      <a href="index.html" class="voltar-post">← Voltar para a página inicial</a>
-    </div>
-
     <div class="post-shell">
       <div id="post-container"></div>
-
-      <aside class="post-lateral">
-        <div class="post-side-card">
-          <strong>Review com linguagem simples</strong>
-          <span>Aqui o foco é deixar tudo fácil de entender, bonito de ler e útil de verdade.</span>
-        </div>
-
-        <div class="post-side-card">
-          <strong>Jeitinho Sunflower</strong>
-          <span>Opinião sincera, visual feminino e conteúdo pensado pra ajudar quem quer comprar melhor.</span>
-        </div>
-
-        <div class="post-side-card">
-          <strong>Beleza sem complicação</strong>
-          <span>Produtos, notas e links organizados de um jeito leve e agradável.</span>
-        </div>
-      </aside>
     </div>
   </main>
 
-  <footer class="rodape">
-    <div class="rodape-conteudo">
-      <p>© 2026 Sunflower Beauty 🌻</p>
-      <p class="rodape-sub">Beleza real, feminina e acessível.</p>
-    </div>
-  </footer>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC8MeOV36Wm0ZJocnPFN7x5rNqls-kb4eM",
-      authDomain: "sunflower-beauty-maquiagem.firebaseapp.com",
-      projectId: "sunflower-beauty-maquiagem",
-      storageBucket: "sunflower-beauty-maquiagem.firebasestorage.app",
-      messagingSenderId: "616836084056",
-      appId: "1:616836084056:web:1c98fda77cbcbdaef752d"
-    };
+    const app = initializeApp({
+      apiKey: "AIza...",
+      authDomain: "sunflower...",
+      projectId: "sunflower..."
+    });
 
-    const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
     const container = document.getElementById("post-container");
 
-    function esc(texto = "") {
-      return String(texto)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
     function renderMarkdown(texto = "") {
-      try {
-        return marked.parse(String(texto));
-      } catch {
-        return esc(texto);
-      }
+      let html = marked.parse(texto);
+
+      html = html.replace(/<\/p>\s*<ul>/g, "</p><ul>");
+      html = html.replace(/<\/p>\s*<ol>/g, "</p><ol>");
+
+      return html;
     }
 
     async function carregarPost() {
-      if (!id) {
-        container.innerHTML = `
-          <article class="post-notfound">
-            <h2>Post não encontrado</h2>
-            <p class="texto-post">Esse link está incompleto ou inválido.</p>
-          </article>
-        `;
-        return;
-      }
+      const ref = doc(db, "posts", id);
+      const snap = await getDoc(ref);
+      const post = snap.data();
 
-      try {
-        const ref = doc(db, "posts", id);
-        const snap = await getDoc(ref);
+      container.innerHTML = `
+        <article class="post-completo">
+          <div class="post-header">
+            <h1>${post.titulo}</h1>
+          </div>
 
-        if (!snap.exists()) {
-          container.innerHTML = `
-            <article class="post-notfound">
-              <h2>Post não encontrado</h2>
-              <p class="texto-post">Esse post não existe ou foi removido.</p>
-            </article>
-          `;
-          return;
-        }
-
-        const post = snap.data();
-
-        try {
-          await updateDoc(ref, {
-            views: increment(1)
-          });
-          post.views = (post.views || 0) + 1;
-        } catch (erroView) {
-          console.error("Erro ao atualizar views:", erroView);
-        }
-
-        const categoria = esc(post.categoria || "Post");
-        const titulo = esc(post.titulo || "Sem título");
-        const data = esc(post.data || "Sem data");
-        const descricao = renderMarkdown(post.descricao || "Sem descrição.");
-        const imagem = post.imagem ? `<img src="${post.imagem}" alt="${titulo}">` : "";
-
-        container.innerHTML = `
-          <article class="post-completo">
-            <div class="post-header">
-              <span class="tag">${categoria}</span>
-              <h1>${titulo}</h1>
-              <p class="meta-post">📅 ${data} • 👁️ ${post.views || 0} visualizações</p>
-            </div>
-
-            ${imagem}
-
-            <div class="texto-post">${descricao}</div>
-
-            ${post.nota ? `<div class="nota-post">⭐ Nota da review: ${esc(post.nota)}/5</div>` : ""}
-
-            ${(post.linkOriginal || post.linkBarato) ? `
-              <div class="caixa-links-post">
-                <h3>Onde comprar</h3>
-                <div class="links-produto">
-                  ${post.linkOriginal ? `<a href="${post.linkOriginal}" target="_blank" rel="noopener noreferrer" class="botao-link-post botao-original">Produto original</a>` : ""}
-                  ${post.linkBarato ? `<a href="${post.linkBarato}" target="_blank" rel="noopener noreferrer" class="botao-link-post botao-barato">Versão mais barata</a>` : ""}
-                </div>
-              </div>
-            ` : ""}
-
-            <div class="frase-review">
-              Opinião sincera, dica útil e beleza sem complicação — esse é o jeitinho Sunflower Beauty 🌻
-            </div>
-          </article>
-        `;
-      } catch (error) {
-        console.error(error);
-        container.innerHTML = `
-          <article class="post-notfound">
-            <h2>Erro ao carregar</h2>
-            <p class="texto-post">Não foi possível abrir esse post agora.</p>
-          </article>
-        `;
-      }
+          <div class="texto-post">
+            ${renderMarkdown(post.descricao)}
+          </div>
+        </article>
+      `;
     }
 
     carregarPost();
