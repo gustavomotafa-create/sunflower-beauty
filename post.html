@@ -112,23 +112,29 @@
     .texto-post h3 { font-size: 1.4rem; }
     .texto-post h4 { font-size: 1.2rem; }
 
+    /* 🔥 CORREÇÃO DO BUG */
     .texto-post p {
-      margin: 0 0 18px;
+      margin: 0 0 10px;
+    }
+
+    .texto-post p + ul,
+    .texto-post p + ol {
+      margin-top: 6px;
+    }
+
+    .texto-post ul,
+    .texto-post ol {
+      margin: 0 0 16px 22px;
+      padding: 0;
+    }
+
+    .texto-post li {
+      margin-bottom: 6px;
     }
 
     .texto-post strong {
       color: #4f3a2b;
       font-weight: 800;
-    }
-
-    .texto-post ul,
-    .texto-post ol {
-      margin: 0 0 20px 22px;
-      padding: 0;
-    }
-
-    .texto-post li {
-      margin-bottom: 8px;
     }
 
     .texto-post blockquote {
