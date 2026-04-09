@@ -10,6 +10,7 @@ const firebaseConfig = {
   messagingSenderId: "616836084056",
   appId: "1:616836084056:web:1c98fda77cbbdaef752d"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -18,7 +19,7 @@ const POSTS_POR_PAGINA = 6;
 let paginaAtual = 1;
 let todosUltimosPosts = [];
 
-// 🔥 NOVO: renderiza markdown
+// usa markdown só onde realmente precisa
 function renderMarkdown(texto = "") {
   try {
     return marked.parse(String(texto));
@@ -40,6 +41,20 @@ function cortarTexto(texto = "", limite = 140) {
   const textoLimpo = String(texto).trim();
   if (textoLimpo.length <= limite) return textoLimpo;
   return textoLimpo.slice(0, limite).trimEnd() + "...";
+}
+
+// limpa markdown das previews/cards
+function limparMarkdown(texto = "") {
+  return String(texto)
+    .replace(/!\[.*?\]\(.*?\)/g, "")
+    .replace(/\[([^\]]+)\]\((.*?)\)/g, "$1")
+    .replace(/(^|\s)(#{1,6})\s+/g, "$1")
+    .replace(/(\*\*|__|\*|_|~~|`)/g, "")
+    .replace(/^>\s?/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/^\s*\d+\.\s+/gm, "")
+    .replace(/\n+/g, " ")
+    .trim();
 }
 
 function transformarDataEmNumero(dataTexto) {
@@ -198,7 +213,7 @@ function renderizarDestaque(post) {
   const linkPost = obterLinkPost(post);
   const categoria = escaparHTML(post.categoria);
   const titulo = escaparHTML(post.titulo);
-  const descricao = renderMarkdown(cortarTexto(post.descricao, 190));
+  const descricao = escaparHTML(cortarTexto(limparMarkdown(post.descricao), 190));
   const imagem = obterImagemSegura(post.imagem);
 
   destaqueContainer.innerHTML = `
@@ -208,7 +223,7 @@ function renderizarDestaque(post) {
         <div class="conteudo-card">
           <span class="tag">${categoria}</span>
           <h3>${titulo}</h3>
-          <div class="texto-markdown-preview">${descricao}</div>
+          <p>${descricao}</p>
         </div>
       </article>
     </a>
@@ -247,7 +262,7 @@ function renderizarPostsPaginados() {
     const linkPost = obterLinkPost(post);
     const categoria = escaparHTML(post.categoria);
     const titulo = escaparHTML(post.titulo);
-    const descricao = renderMarkdown(cortarTexto(post.descricao, 110));
+    const descricao = escaparHTML(cortarTexto(limparMarkdown(post.descricao), 110));
     const imagem = obterImagemSegura(post.imagem);
 
     postsDinamicos.innerHTML += `
@@ -257,7 +272,7 @@ function renderizarPostsPaginados() {
           <div class="conteudo-card">
             <span class="tag">${categoria}</span>
             <h3>${titulo}</h3>
-            <div class="texto-markdown-preview">${descricao}</div>
+            <p>${descricao}</p>
           </div>
         </article>
       </a>
@@ -290,7 +305,7 @@ function renderizarMaisVistos(posts) {
     const linkPost = obterLinkPost(post);
     const categoria = escaparHTML(post.categoria);
     const titulo = escaparHTML(post.titulo);
-    const descricao = renderMarkdown(cortarTexto(post.descricao, 70));
+    const descricao = escaparHTML(cortarTexto(limparMarkdown(post.descricao), 70));
     const imagem = obterImagemSegura(post.imagem);
     const views = post.views || 0;
 
@@ -301,7 +316,7 @@ function renderizarMaisVistos(posts) {
           <div class="mini-post-info">
             <span class="tag">${categoria}</span>
             <h4>${titulo}</h4>
-            <div class="texto-markdown-preview">${descricao}</div>
+            <p>${descricao}</p>
             <p class="mini-post-views">💖 ${views} visualizações</p>
           </div>
         </div>
