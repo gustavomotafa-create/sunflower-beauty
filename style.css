@@ -1082,8 +1082,8 @@ button:hover {
 
 @media (max-width: 980px) {
   .container {
-    flex-direction: column;
-  }
+  flex-direction: row;
+}
 
   .lateral {
     width: 100%;
