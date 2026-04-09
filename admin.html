@@ -47,7 +47,7 @@
       font-size: 2rem;
     }
 
-    h1, h2, h3 {
+    h1, h2, h3, h4 {
       margin-bottom: 15px;
       color: #5a4331;
     }
@@ -123,6 +123,11 @@
 
     .btn-importar {
       background: linear-gradient(135deg, #c9b26b, #a7893d);
+      color: white;
+    }
+
+    .btn-roxo {
+      background: linear-gradient(135deg, #c08cff, #8d63e6);
       color: white;
     }
 
@@ -278,6 +283,67 @@
       flex-wrap: wrap;
     }
 
+    .ajuda-box {
+      background: #fff7e8;
+      border: 1px solid #ecd7a5;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 4px;
+      margin-bottom: 18px;
+    }
+
+    .ajuda-box h4 {
+      margin-bottom: 10px;
+      color: #a56f10;
+    }
+
+    .ajuda-box p {
+      margin-bottom: 10px;
+      color: #7b6549;
+    }
+
+    .ajuda-box code {
+      display: block;
+      background: #fffdf9;
+      border: 1px solid #eddcb2;
+      border-radius: 10px;
+      padding: 12px;
+      color: #6c533c;
+      word-break: break-word;
+      font-size: 14px;
+    }
+
+    .bloco-imagem-conteudo {
+      background: #fff7ef;
+      border: 1px solid #efd9b5;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .bloco-imagem-conteudo h4 {
+      color: #8f6325;
+      margin-bottom: 8px;
+    }
+
+    .bloco-imagem-conteudo p {
+      margin-bottom: 12px;
+      color: #7b6549;
+    }
+
+    .acoes-imagem-conteudo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .acoes-imagem-conteudo input {
+      margin-bottom: 0;
+      flex: 1;
+      min-width: 240px;
+    }
+
     @media (max-width: 700px) {
       .caixa {
         padding: 20px;
@@ -294,6 +360,11 @@
       .post-item img {
         width: 100%;
         height: 200px;
+      }
+
+      .acoes-imagem-conteudo {
+        flex-direction: column;
+        align-items: stretch;
       }
     }
   </style>
@@ -342,12 +413,34 @@
           <option value="mais-vistos">Mais amados</option>
         </select>
 
-        <input type="text" id="imagem" placeholder="Link da imagem">
+        <input type="text" id="imagem" placeholder="Link da imagem principal do post">
         <input type="number" id="nota" min="1" max="5" placeholder="Nota da review (1 a 5)">
         <input type="text" id="linkOriginal" placeholder="Link do produto original">
         <input type="text" id="linkBarato" placeholder="Link da versão mais barata">
 
-        <textarea id="descricao" rows="6" placeholder="Descrição do post"></textarea>
+        <textarea id="descricao" rows="10" placeholder="Descrição do post"></textarea>
+
+        <div class="bloco-imagem-conteudo">
+          <h4>🖼️ Inserir imagem dentro do texto</h4>
+          <p>
+            Cole o link de uma imagem da internet e clique no botão. O marcador será inserido
+            exatamente no ponto onde o cursor estiver no texto.
+          </p>
+
+          <div class="acoes-imagem-conteudo">
+            <input type="text" id="imagemNoConteudo" placeholder="Cole aqui o link da imagem que vai entrar no meio do texto">
+            <button type="button" class="btn-roxo" onclick="inserirImagemNoTexto()">Inserir imagem no texto</button>
+          </div>
+        </div>
+
+        <div class="ajuda-box">
+          <h4>Como usar dentro do conteúdo ✨</h4>
+          <p>Quando você inserir uma imagem no texto, vai aparecer um marcador assim:</p>
+          <code>[img:https://link-da-imagem.jpg]</code>
+          <p>
+            Esse marcador vai aparecer automaticamente no site no ponto exato onde ele estiver no texto.
+          </p>
+        </div>
 
         <div class="acoes-form">
           <button onclick="salvarPost()" id="botaoSalvar">Publicar 🚀</button>
@@ -386,14 +479,14 @@
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyC8MeOV36Wm0ZJocnPFN7x5rNqls-kb4eM",
-  authDomain: "sunflower-beauty-maquiagem.firebaseapp.com",
-  projectId: "sunflower-beauty-maquiagem",
-  storageBucket: "sunflower-beauty-maquiagem.firebasestorage.app",
-  messagingSenderId: "616836084056",
-  appId: "1:616836084056:web:1c98fda77cbbdaef752d"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyC8MeOV36Wm0ZJocnPFN7x5rNqls-kb4eM",
+      authDomain: "sunflower-beauty-maquiagem.firebaseapp.com",
+      projectId: "sunflower-beauty-maquiagem",
+      storageBucket: "sunflower-beauty-maquiagem.firebasestorage.app",
+      messagingSenderId: "616836084056",
+      appId: "1:616836084056:web:1c98fda77cbbdaef752d"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -403,6 +496,67 @@
     let editandoDataOriginal = null;
     let editandoCriadoEmOriginal = null;
     window.postsRenderizados = [];
+
+    function gerarSlug(texto) {
+      return texto
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-");
+    }
+
+    function gerarDataAtual() {
+      const hoje = new Date();
+      const dia = String(hoje.getDate()).padStart(2, "0");
+      const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+      const ano = hoje.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function gerarPreviewDescricao(texto) {
+      if (!texto) return "";
+
+      return texto
+        .replace(/\[img:(.*?)\]/gi, "\n[Imagem no conteúdo]\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function inserirTextoNoCursor(textarea, textoParaInserir) {
+      const inicio = textarea.selectionStart ?? textarea.value.length;
+      const fim = textarea.selectionEnd ?? textarea.value.length;
+      const antes = textarea.value.substring(0, inicio);
+      const depois = textarea.value.substring(fim);
+
+      textarea.value = antes + textoParaInserir + depois;
+
+      const novaPosicao = inicio + textoParaInserir.length;
+      textarea.focus();
+      textarea.setSelectionRange(novaPosicao, novaPosicao);
+    }
+
+    function limparFormulario() {
+      document.getElementById("titulo").value = "";
+      document.getElementById("imagem").value = "";
+      document.getElementById("descricao").value = "";
+      document.getElementById("nota").value = "";
+      document.getElementById("linkOriginal").value = "";
+      document.getElementById("linkBarato").value = "";
+      document.getElementById("imagemNoConteudo").value = "";
+      document.getElementById("categoria").value = "reviews sinceras";
+      document.getElementById("exibicao").value = "normal";
+      document.getElementById("titulo").focus();
+
+      editandoDocId = null;
+      editandoDataOriginal = null;
+      editandoCriadoEmOriginal = null;
+      document.getElementById("tituloFormulario").textContent = "Criar Post";
+      document.getElementById("modoEdicao").style.display = "none";
+      document.getElementById("botaoSalvar").textContent = "Publicar 🚀";
+      document.getElementById("botaoCancelar").style.display = "none";
+    }
 
     window.login = async function () {
       const email = document.getElementById("email").value.trim();
@@ -426,6 +580,24 @@
       }
     };
 
+    window.inserirImagemNoTexto = function () {
+      const inputLink = document.getElementById("imagemNoConteudo");
+      const textarea = document.getElementById("descricao");
+      const link = inputLink.value.trim();
+
+      if (!link) {
+        alert("Cole o link da imagem primeiro 😅");
+        inputLink.focus();
+        return;
+      }
+
+      const marcador = `\n[img:${link}]\n`;
+      inserirTextoNoCursor(textarea, marcador);
+
+      inputLink.value = "";
+      alert("Imagem inserida no texto ✨");
+    };
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         document.getElementById("loginBox").style.display = "none";
@@ -436,44 +608,6 @@
         document.getElementById("painel").style.display = "none";
       }
     });
-
-    function gerarSlug(texto) {
-      return texto
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9\s-]/g, "")
-        .trim()
-        .replace(/\s+/g, "-");
-    }
-
-    function gerarDataAtual() {
-      const hoje = new Date();
-      const dia = String(hoje.getDate()).padStart(2, "0");
-      const mes = String(hoje.getMonth() + 1).padStart(2, "0");
-      const ano = hoje.getFullYear();
-      return `${dia}/${mes}/${ano}`;
-    }
-
-    function limparFormulario() {
-      document.getElementById("titulo").value = "";
-      document.getElementById("imagem").value = "";
-      document.getElementById("descricao").value = "";
-      document.getElementById("nota").value = "";
-      document.getElementById("linkOriginal").value = "";
-      document.getElementById("linkBarato").value = "";
-      document.getElementById("categoria").value = "reviews sinceras";
-      document.getElementById("exibicao").value = "normal";
-      document.getElementById("titulo").focus();
-
-      editandoDocId = null;
-      editandoDataOriginal = null;
-      editandoCriadoEmOriginal = null;
-      document.getElementById("tituloFormulario").textContent = "Criar Post";
-      document.getElementById("modoEdicao").style.display = "none";
-      document.getElementById("botaoSalvar").textContent = "Publicar 🚀";
-      document.getElementById("botaoCancelar").style.display = "none";
-    }
 
     window.salvarPost = async function () {
       const titulo = document.getElementById("titulo").value.trim();
@@ -568,6 +702,7 @@
         const exibicaoTexto = (post.exibicao || "normal") === "mais-vistos" ? "Mais amados" : "Últimos posts";
         const views = post.views || 0;
         const notaTexto = post.nota ? `⭐ ${post.nota}/5` : "Sem nota";
+        const descricaoPreview = gerarPreviewDescricao(post.descricao || "");
 
         lista.innerHTML += `
           <div class="post-item">
@@ -577,7 +712,7 @@
               <span class="tag-secundaria">${exibicaoTexto}</span>
               <p><strong>${post.titulo}</strong></p>
               <p class="meta">📅 ${post.data || ""} • 👁️ ${views} visualizações • ${notaTexto}</p>
-              <p class="descricao-preview">${post.descricao || ""}</p>
+              <p class="descricao-preview">${descricaoPreview}</p>
               <p class="slug">🔗 slug: ${post.slug || ""}</p>
               ${post.linkOriginal ? `<p class="link-preview">🛍️ Original: ${post.linkOriginal}</p>` : ""}
               ${post.linkBarato ? `<p class="link-preview">💸 Barato: ${post.linkBarato}</p>` : ""}
@@ -603,6 +738,7 @@
       document.getElementById("nota").value = post.nota || "";
       document.getElementById("linkOriginal").value = post.linkOriginal || "";
       document.getElementById("linkBarato").value = post.linkBarato || "";
+      document.getElementById("imagemNoConteudo").value = "";
 
       editandoDocId = post.id || null;
       editandoDataOriginal = post.data || gerarDataAtual();
@@ -757,7 +893,6 @@
 
       try {
         const snapshot = await getDocs(collection(db, "posts"));
-
         const promessas = [];
 
         snapshot.forEach((item) => {

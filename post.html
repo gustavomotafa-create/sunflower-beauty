@@ -79,7 +79,7 @@
       line-height: 1.7;
     }
 
-    .post-completo img {
+    .post-completo > img {
       width: 100%;
       max-height: 470px;
       object-fit: cover;
@@ -112,7 +112,6 @@
     .texto-post h3 { font-size: 1.4rem; }
     .texto-post h4 { font-size: 1.2rem; }
 
-    /* 🔥 CORREÇÃO DO BUG */
     .texto-post p {
       margin: 0 0 10px;
     }
@@ -160,6 +159,17 @@
 
     .texto-post a:hover {
       text-decoration: underline;
+    }
+
+    .imagem-no-conteudo {
+      width: 100%;
+      max-width: 760px;
+      display: block;
+      margin: 22px auto;
+      border-radius: 18px;
+      background: #fff7e8;
+      box-shadow: 0 10px 22px rgba(176, 132, 76, 0.10);
+      object-fit: cover;
     }
 
     .nota-post {
@@ -291,8 +301,12 @@
         font-size: 2.1rem;
       }
 
-      .post-completo img {
+      .post-completo > img {
         max-height: 260px;
+      }
+
+      .imagem-no-conteudo {
+        max-height: 320px;
       }
 
       .texto-post h1 { font-size: 1.7rem; }
@@ -360,6 +374,20 @@
     <div class="rodape-conteudo">
       <p>© 2026 Sunflower Gorgeous 🌻</p>
       <p class="rodape-sub">Beleza real, feminina e acessível.</p>
+
+      <div class="rodape-links">
+        <a href="sobre.html">Sobre</a>
+        <span>•</span>
+        <a href="privacidade.html">Privacidade</a>
+        <span>•</span>
+        <a href="termos.html">Termos de Uso</a>
+        <span>•</span>
+        <a href="contato.html">Contato</a>
+      </div>
+
+      <p class="rodape-sub">
+        📩 <a href="mailto:sunflowercollectivegf@gmail.com">sunflowercollectivegf@gmail.com</a>
+      </p>
     </div>
   </footer>
 
@@ -367,14 +395,14 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC8MeOV36Wm0ZJocnPFN7x5rNqls-kb4eM",
-  authDomain: "sunflower-beauty-maquiagem.firebaseapp.com",
-  projectId: "sunflower-beauty-maquiagem",
-  storageBucket: "sunflower-beauty-maquiagem.firebasestorage.app",
-  messagingSenderId: "616836084056",
-  appId: "1:616836084056:web:1c98fda77cbdaef752d"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyC8MeOV36Wm0ZJocnPFN7x5rNqls-kb4eM",
+      authDomain: "sunflower-beauty-maquiagem.firebaseapp.com",
+      projectId: "sunflower-beauty-maquiagem",
+      storageBucket: "sunflower-beauty-maquiagem.firebasestorage.app",
+      messagingSenderId: "616836084056",
+      appId: "1:616836084056:web:1c98fda77cbdaef752d"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -392,13 +420,28 @@ const firebaseConfig = {
         .replaceAll("'", "&#039;");
     }
 
-    // 🔥 FUNÇÃO CORRIGIDA (ÚNICA MUDANÇA)
+    function normalizarUrlImagem(url = "") {
+      const limpa = String(url).trim();
+      if (!/^https?:\/\//i.test(limpa)) return "";
+      return limpa;
+    }
+
+    function transformarMarcadoresDeImagem(texto = "") {
+      return String(texto).replace(/\[img:(.*?)\]/gi, (match, url) => {
+        const urlLimpa = normalizarUrlImagem(url);
+        if (!urlLimpa) return "";
+        return `\n<img src="${esc(urlLimpa)}" alt="Imagem do conteúdo" class="imagem-no-conteudo">\n`;
+      });
+    }
+
     function renderMarkdown(texto = "") {
       try {
-        let html = marked.parse(String(texto));
+        const textoTratado = transformarMarcadoresDeImagem(texto);
+        let html = marked.parse(String(textoTratado));
 
         html = html.replace(/<\/p>\s*<ul>/g, "</p><ul>");
         html = html.replace(/<\/p>\s*<ol>/g, "</p><ol>");
+        html = html.replace(/<p>\s*(<img[^>]+class="imagem-no-conteudo"[^>]*>)\s*<\/p>/g, "$1");
 
         return html;
       } catch {
@@ -446,7 +489,8 @@ const firebaseConfig = {
         const titulo = esc(post.titulo || "Sem título");
         const data = esc(post.data || "Sem data");
         const descricao = renderMarkdown(post.descricao || "Sem descrição.");
-        const imagem = post.imagem ? `<img src="${post.imagem}" alt="${titulo}">` : "";
+        const imagemPrincipal = normalizarUrlImagem(post.imagem);
+        const imagem = imagemPrincipal ? `<img src="${esc(imagemPrincipal)}" alt="${titulo}">` : "";
 
         container.innerHTML = `
           <article class="post-completo">
@@ -466,8 +510,8 @@ const firebaseConfig = {
               <div class="caixa-links-post">
                 <h3>Onde comprar</h3>
                 <div class="links-produto">
-                  ${post.linkOriginal ? `<a href="${post.linkOriginal}" target="_blank" rel="noopener noreferrer" class="botao-link-post botao-original">Produto original</a>` : ""}
-                  ${post.linkBarato ? `<a href="${post.linkBarato}" target="_blank" rel="noopener noreferrer" class="botao-link-post botao-barato">Versão mais barata</a>` : ""}
+                  ${post.linkOriginal ? `<a href="${esc(post.linkOriginal)}" target="_blank" rel="noopener noreferrer" class="botao-link-post botao-original">Produto original</a>` : ""}
+                  ${post.linkBarato ? `<a href="${esc(post.linkBarato)}" target="_blank" rel="noopener noreferrer" class="botao-link-post botao-barato">Versão mais barata</a>` : ""}
                 </div>
               </div>
             ` : ""}

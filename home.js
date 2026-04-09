@@ -19,15 +19,6 @@ const POSTS_POR_PAGINA = 6;
 let paginaAtual = 1;
 let todosUltimosPosts = [];
 
-// usa markdown só onde realmente precisa
-function renderMarkdown(texto = "") {
-  try {
-    return marked.parse(String(texto));
-  } catch {
-    return String(texto);
-  }
-}
-
 function escaparHTML(texto = "") {
   return String(texto)
     .replaceAll("&", "&amp;")
@@ -43,9 +34,9 @@ function cortarTexto(texto = "", limite = 140) {
   return textoLimpo.slice(0, limite).trimEnd() + "...";
 }
 
-// limpa markdown das previews/cards
 function limparMarkdown(texto = "") {
   return String(texto)
+    .replace(/\[img:(.*?)\]/gi, " ")
     .replace(/!\[.*?\]\(.*?\)/g, "")
     .replace(/\[([^\]]+)\]\((.*?)\)/g, "$1")
     .replace(/(^|\s)(#{1,6})\s+/g, "$1")
@@ -54,6 +45,7 @@ function limparMarkdown(texto = "") {
     .replace(/^\s*[-*+]\s+/gm, "")
     .replace(/^\s*\d+\.\s+/gm, "")
     .replace(/\n+/g, " ")
+    .replace(/\s{2,}/g, " ")
     .trim();
 }
 
@@ -254,6 +246,11 @@ function renderizarPostsPaginados() {
   }
 
   const totalPaginas = Math.ceil(todosUltimosPosts.length / POSTS_POR_PAGINA);
+
+  if (paginaAtual > totalPaginas) {
+    paginaAtual = totalPaginas;
+  }
+
   const inicio = (paginaAtual - 1) * POSTS_POR_PAGINA;
   const fim = inicio + POSTS_POR_PAGINA;
   const postsDaPagina = todosUltimosPosts.slice(inicio, fim);
