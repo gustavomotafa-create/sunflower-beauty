@@ -367,7 +367,7 @@
         const snapshot = await getDocs(collection(db, "posts"));
         snapshot.forEach((item) => {
           const dados = item.data();
-          if ((dados.categoria || "").toLowerCase() === categoriaAlvo) {
+          if ((dados.categoria || "").trim().toLowerCase() === categoriaAlvo.trim().toLowerCase()) {
             posts.push({ id: item.id, ...dados });
           }
         });
